@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TabFlow</title>
+    <style>
+        :root {
+            --bg: #1A1714;
+            --surface: #24201B;
+            --surface-hover: #2E2923;
+            --border: rgba(193, 124, 78, 0.12);
+            --text: #E8E2D8;
+            --text-dim: #8A8072;
+            --accent: #C17C4E;
+            --accent-hover: #D4915F;
+            --green: #5CBF8A;
+            --red: #D96B6B;
+            --radius: 8px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            width: 370px;
+            max-height: 580px;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ---- Header ---- */
+        .header {
+            padding: 14px 16px;
+            background-color: var(--surface);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h1 {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: var(--text);
+        }
+        #tab-summary {
+            font-size: 11px;
+            color: var(--text-dim);
+            background: var(--bg);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-variant-numeric: tabular-nums;
+        }
+        #focus-mode-toggle {
+            padding: 7px 12px;
+            background-color: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background-color 0.15s;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
+        }
+        #focus-mode-toggle:hover {
+            background-color: var(--accent-hover);
+        }
+        #focus-mode-toggle.focus-mode-enabled {
+            background-color: var(--green);
+            color: #1A1714;
+        }
+
+        /* ---- Search ---- */
+        #search-input {
+            width: calc(100% - 32px);
+            padding: 9px 12px;
+            margin: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background-color: var(--surface);
+            color: var(--text);
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        #search-input:focus {
+            border-color: var(--accent);
+        }
+        #search-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        /* ---- Tab List ---- */
+        #tabs-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 16px 16px;
+        }
+        #tabs-list::-webkit-scrollbar { width: 4px; }
+        #tabs-list::-webkit-scrollbar-track { background: transparent; }
+        #tabs-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* ---- Groups ---- */
+        .tab-group h2 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 14px 0 6px;
+            color: var(--text-dim);
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ---- Tab Row ---- */
+        .tab-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 10px;
+            background-color: transparent;
+            border-radius: 6px;
+            margin-bottom: 2px;
+            transition: background-color 0.1s;
+        }
+        .tab-container:hover {
+            background-color: var(--surface-hover);
+        }
+        .tab-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+            gap: 8px;
+        }
+        .favicon {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+        .tab-info a {
+            color: var(--text);
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+        .tab-info a:hover {
+            color: var(--accent);
+        }
+
+        /* ---- Tab Actions ---- */
+        .tab-actions {
+            flex-shrink: 0;
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+        .tab-container:hover .tab-actions {
+            opacity: 1;
+        }
+        .tab-actions button {
+            padding: 4px 8px;
+            margin-left: 4px;
+            background-color: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.1s;
+            font-size: 11px;
+            font-family: inherit;
+        }
+        .tab-actions button:hover {
+            background-color: rgba(217, 107, 107, 0.15);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        /* ---- Footer ---- */
+        .footer {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background-color: var(--surface);
+            border-top: 1px solid var(--border);
+        }
+        .footer button {
+            flex: 1;
+            padding: 8px 10px;
+            background-color: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 12px;
+            font-family: inherit;
+            font-weight: 500;
+        }
+        .footer button:hover {
+            background-color: var(--surface-hover);
+            border-color: rgba(193, 124, 78, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>TabFlow</h1>
+            <div id="tab-summary"></div>
+        </div>
+        <button id="focus-mode-toggle">Focus Mode</button>
+    </div>
+
+    <input type="text" id="search-input" placeholder="search tabs...">
+
+    <div id="tabs-list"></div>
+
+    <div class="footer">
+        <button id="save-session">Save Session</button>
+        <button id="restore-session">Restore Session</button>
+        <button id="settings-button">Settings</button>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
